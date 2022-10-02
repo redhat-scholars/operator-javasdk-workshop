@@ -1,0 +1,79 @@
+# Create a Service Resource
+
+Finally we need to expose our `Deployment` , so let's update our operator so create a service.
+
+Create a java class named `ServiceDependant.java` with the following content : 
+
+[.lines_7]
+[.console-input]
+[source, java,subs="+macros,+attributes"]
+----
+
+package com.redhat.devnation;
+
+import java.util.Map;
+
+import io.fabric8.kubernetes.api.model.IntOrString;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;
+
+public class ServiceDependant extends CRUDKubernetesDependentResource<Service, Greeting> {
+
+    public ServiceDependant() {
+        super(Service.class); 
+    }
+    
+    @Override
+    protected Service desired(Greeting primary, Context<Greeting> context) {
+        Service service = new ServiceBuilder()
+        .withNewMetadata()
+            .withName("greeting-service")
+            .withLabels(Map.of("app", "greeting-app"))
+        .endMetadata()
+        .withNewSpec()
+            .withType("LoadBalancer")
+            .addNewPort()
+                .withPort(8080)
+                .withTargetPort(new IntOrString(8080))
+                .withProtocol("TCP")
+            .endPort()
+            .withSelector(Map.of("app", "greeting-app"))
+        .endSpec()
+        .build();
+        return service;
+    }
+}
+
+----
+
+And make sure to update the reconciler with the new dependant resource : 
+
+[.lines_7]
+[.console-input]
+[source, java,subs="+macros,+attributes"]
+----
+
+@ControllerConfiguration(namespaces = WATCH_CURRENT_NAMESPACE, dependents = {
+  @Dependent(type = DeploymentDependant.class),
+  @Dependent(type = ServiceDependant.class)})
+
+----
+
+Make sure your service has been created : `kubectl get service` 
+
+you should have an output like : 
+
+```
+NAME               TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)          AGE
+greeting-service   LoadBalancer   172.21.50.5   169.51.34.122   8080:30298/TCP   53m
+```
+
+You can test your service with the external ip with port `8080` ! 
+
+## Update your CR 
+
+It's time to play with our Operator, take your `Greeting.yaml` file and make some changes and don't forget to apply it again !
+
+

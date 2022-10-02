@@ -1,0 +1,6 @@
+# Bonus tasks 
+
+## Implement the Status object
+
+## Create an OpenShift Route 
+

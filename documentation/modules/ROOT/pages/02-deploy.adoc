@@ -1,43 +1,34 @@
-= Deploy Service
-include::_attributes.adoc[]
+= Deploy your operator 
 
-[#service]
-== The Service
-
-The code:
+First add those 2 fields to `GreetingSpec.java` 
 
 [.lines_7]
 [.console-input]
 [source, java,subs="+macros,+attributes"]
 ----
-public class Main {
+    private String color;
+    private String greeting;
 
-    public static void main(String[] args) {
-
-    } 
-
-}
-
-./mvnw compile
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }
+    public String getGreeting() {
+        return greeting;
+    }
+    public void setGreeting(String greeting) {
+        this.greeting = greeting;
+    }
 ----
 
-[#package]
-== Packaging the Service
+Start your project in dev mode : `mvn quarkus:dev`
 
-You can package the next bash script:
+Make sure you CRD got installed on the cluster : `kubectl get crds | grep "devnation"`
 
-[source,bash,subs="+macros,+attributes"]
-----
-include::example$run.sh[]
-----
+Something like this should be outputed : 
+```
+greetings.devnation.redhat.com                              2022-10-02T08:41:54Z
 
-[#deploy]
-== Deploy the Service
-
-And then you can deploy the service and execute commands inside:
-
-:podname: apps
-
-include::partial$exec_pod.adoc[]
-
-:!podname:
+``` 

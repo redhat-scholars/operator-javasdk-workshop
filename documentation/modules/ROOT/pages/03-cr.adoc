@@ -1,0 +1,32 @@
+# Deploy your Custom Resource
+
+Create a new file `Greeting.yaml` with the following content : 
+
+[.lines_7]
+[.console-input]
+[source, java,subs="+macros,+attributes"]
+----
+apiVersion: "devnation.redhat.com/v1"
+kind: Greeting
+metadata:
+  name: greeting-instance
+spec: 
+  color: "orange"
+  greeting: "Bonjour"
+
+----
+
+And apply it to your cluster :
+
+```
+kubectl apply -f Greeting.yaml
+```
+
+Make sure you see the created resource : `kubectl get Greeting`
+
+You should see one instance : 
+
+```
+NAME                AGE
+greeting-instance   65m
+```

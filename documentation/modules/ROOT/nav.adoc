@@ -1,7 +1,8 @@
 * xref:01-setup.adoc[1. Setup]
-** xref:01-setup.adoc#prerequisite[Prerequisites]
-** xref:01-setup.adoc#minikube[Setup Minikube]
 
-* xref:02-deploy.adoc[2. Deploy Service]
-** xref:02-deploy.adoc#package[Build Service]
-** xref:02-deploy.adoc#deploy[Deploy Dervice]
+
+* xref:02-deploy.adoc[2. Deploy your operator]
+* xref:03-cr.adoc[3. Deploy your Custom Resource]
+* xref:04-create-deployment.adoc[4. Create Deployment Resource]
+* xref:05-create-service.adoc[5. Create Service Resource]
+* xref:06-bonus.adoc[6. Bonus]

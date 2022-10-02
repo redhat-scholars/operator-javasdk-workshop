@@ -1,0 +1,105 @@
+# Create Deployment Dependant Resource
+
+Now it's time for our Operator to actually do something, let's have him create a `Deployment` for us using the information from our Custom Resource : 
+
+Create a new Java class named `DeploymentDependant` with the following content : 
+
+
+[.lines_7]
+[.console-input]
+[source, java,subs="+macros,+attributes"]
+----
+
+package com.redhat.devnation;
+
+
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;
+
+public class DeploymentDependant extends CRUDKubernetesDependentResource<Deployment, Greeting> {
+
+    public DeploymentDependant() {
+        super(Deployment.class); 
+    }
+
+    @Override
+    protected Deployment desired(Greeting primary, Context<Greeting> context) {
+        Deployment deployment = new DeploymentBuilder()
+        .withNewMetadata()
+           .withName("greeting-app")
+           .addToLabels("app", "greeting-app")
+        .endMetadata()
+        .withNewSpec()
+           .withReplicas(1)
+           .withNewTemplate()
+             .withNewMetadata()
+             .addToLabels("app", "greeting-app")
+             .endMetadata()
+             .withNewSpec()
+               .addNewContainer()
+                  .withName("greeting-container")
+                  .withImage("quay.io/rhdevelopers/blue-green-canary")
+                  .addNewEnv().withName("BLUE_GREEN_CANARY_COLOR").withValue(primary.getSpec().getColor()).endEnv()
+                  .addNewEnv().withName("BLUE_GREEN_CANARY_MESSAGE").withValue(primary.getSpec().getGreeting()).endEnv()
+               .endContainer()
+             .endSpec()
+           .endTemplate()
+           .withNewSelector()
+             .addToMatchLabels("app","greeting-app")
+           .endSelector()
+        .endSpec()
+      .build();
+    return deployment;
+    }
+}
+----
+
+And now let's update our reconciler, `GreetingReconciler.java` 
+
+[.lines_7]
+[.console-input]
+[source, java,subs="+macros,+attributes"]
+----
+
+package com.redhat.devnation;
+
+import static io.javaoperatorsdk.operator.api.reconciler.Constants.WATCH_CURRENT_NAMESPACE;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
+import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
+import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
+
+@ControllerConfiguration(namespaces = WATCH_CURRENT_NAMESPACE, dependents = {
+  @Dependent(type = DeploymentDependant.class))})
+public class GreetingReconciler implements Reconciler<Greeting> { 
+  private final KubernetesClient client;
+
+  public GreetingReconciler(KubernetesClient client) {
+    this.client = client;
+  }
+
+  // TODO Fill in the rest of the reconciler
+
+  @Override
+  public UpdateControl<Greeting> reconcile(Greeting resource, Context context) {
+    // TODO: fill in logic
+
+    return UpdateControl.noUpdate();
+  }
+}
+----
+
+Make sure a deployment has been created : `kubectl get deployment`
+
+You should have an output like : 
+
+```
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+greeting-app   1/1     1            1           70m
+```
+
+

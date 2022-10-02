@@ -1,29 +1,25 @@
 = Setup
 include::_attributes.adoc[]
 
-[#prerequisite]
-== Prerequisite CLI tools
+== Clone Git Repository
 
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/prerequisites-kubernetes.adoc[]
-|===
+`git clone https://github.com/sebastienblanc/greeting-operator.git`
 
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/optional-requisites.adoc[]
-|===
+== Connect to a Kubernetes cluster
 
-[#minikube]
-== Setup Kubernetes
+Ask to your instructor for instruction, if you are using ROKS you can get your cluster https://get-devcluster-stage.apps.sandbox-stage.gb17.p1.openshiftapps.com/[here] 
 
-:profile: my_profile
+This workshop also works with minikube
 
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/kubernetes-setup.adoc[]
+NOTE: This workshop does not work with the OpenShift Developer sandbox
 
-And then you are ready for start using Kubernetes:
+== IDE 
 
-image::kubelogo.png[]
+You can use any IDE you want, as long you have support for JDK11 and Maven 
 
-[#downloadtutorial]
-== Get tutorial sources
+An other option is to use "Red Hat OpenShift Devspaces" you can get access to this by creating a developer https://developers.redhat.com/developer-sandbox[sandbox account]
 
-:tutorial-url: https://github.com/redhat-developer-demos/rhd-tutorial-common.git
-:folder: my_folder
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/download-sources.adoc[]
+== Resources 
+
+* https://javaoperatorsdk.io/docs/getting-started[Java Operator SDK Doc]
+* https://github.com/fabric8io/kubernetes-client/blob/master/doc/CHEATSHEET.md[Fabric8 K8s CLient Cheat Sheet] 
