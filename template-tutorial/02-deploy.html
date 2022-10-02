@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Deploy Service :: Template Tutorial</title>
+    <title>Deploy your operator :: Java Operator Workshop</title>
     <link rel="canonical" href="https://redhat-scholars.github.io/course-template/template-tutorial/02-deploy.html">
     <link rel="prev" href="01-setup.html">
+    <link rel="next" href="03-cr.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
   </head>
@@ -14,7 +15,7 @@
   <nav class="navbar">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img src="../_/img/NewRHDFullLogo_4-color_white-wordmark.png" height="40px" alt="Red Hat Developer Program"></a>
-      <a class="navbar-item" style="font-size: 24px; color: white" href="https://redhat-scholars.github.io/course-template">Template Tutorial</a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="https://redhat-scholars.github.io/course-template">Java Operator Workshop</a>
       <button class="navbar-burger" data-target="topbar-nav">
         <span></span>
         <span></span>
@@ -51,28 +52,22 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="01-setup.html">1. Setup</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="01-setup.html#prerequisite">Prerequisites</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="01-setup.html#minikube">Setup Minikube</a>
-  </li>
-</ul>
   </li>
   <li class="nav-item is-current-page" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="02-deploy.html">2. Deploy Service</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#package">Build Service</a>
+    <a class="nav-link" href="02-deploy.html">2. Deploy your operator</a>
   </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#deploy">Deploy Dervice</a>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="03-cr.html">3. Deploy your Custom Resource</a>
   </li>
-</ul>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="04-create-deployment.html">4. Create Deployment Resource</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="05-create-service.html">5. Create Service Resource</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="06-bonus.html">6. Bonus</a>
   </li>
 </ul>
   </li>
@@ -89,93 +84,53 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Template Tutorial</a></li>
-    <li><a href="02-deploy.html">2. Deploy Service</a></li>
+    <li><a href="02-deploy.html">2. Deploy your operator</a></li>
   </ul>
 </nav>
   <div class="edit-this-page"><a href="https://github.com/redhat-scholars/operator-javasdk-workshop/edit/master/documentation/modules/ROOT/pages/02-deploy.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Deploy Service</h1>
-<div class="sect1">
-<h2 id="service"><a class="anchor" href="#service"></a>The Service</h2>
-<div class="sectionbody">
+<h1 class="page">Deploy your operator</h1>
 <div class="paragraph">
-<p>The code:</p>
+<p>First add those 2 fields to <code>GreetingSpec.java</code></p>
 </div>
 <div class="listingblock lines_7 console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Main {
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    private String color;
+    private String greeting;
 
-    public static void main(String[] args) {
-
+    public String getColor() {
+        return color;
     }
-
-}
-
-./mvnw compile</code></pre>
+    public void setColor(String color) {
+        this.color = color;
+    }
+    public String getGreeting() {
+        return greeting;
+    }
+    public void setGreeting(String greeting) {
+        this.greeting = greeting;
+    }</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="package"><a class="anchor" href="#package"></a>Packaging the Service</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>You can package the next bash script:</p>
+<p>Start your project in dev mode : <code>mvn quarkus:dev</code></p>
+</div>
+<div class="paragraph">
+<p>Make sure you CRD got installed on the cluster : <code>kubectl get crds | grep "devnation"</code></p>
+</div>
+<div class="paragraph">
+<p>Something like this should be outputed :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/sh
-echo "Hello World"</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy the Service</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>And then you can deploy the service and execute commands inside:</p>
-</div>
-<div class="paragraph">
-<p>Check that the pod is up and running:</p>
-</div>
-<div class="listingblock lines_space console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl get pods</code></pre>
-</div>
-</div>
-<div class="listingblock console-output">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                        READY   STATUS    RESTARTS   AGE
-apps   1/1     Running   0          5s</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then let&#8217;s go into the running pod to execute some commands:</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl exec -ti apps /bin/bash</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Change the pod name with your pod name.
-</td>
-</tr>
-</table>
-</div>
+<pre class="highlightjs highlight"><code class="language-none hljs">greetings.devnation.redhat.com                              2022-10-02T08:41:54Z</code></pre>
 </div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="01-setup.html">1. Setup</a></span>
+  <span class="next"><a href="03-cr.html">3. Deploy your Custom Resource</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Setup :: Java Operator Workshop</title>
-    <link rel="canonical" href="https://redhat-scholars.github.io/course-template/template-tutorial/01-setup.html">
-    <link rel="prev" href="index.html">
-    <link rel="next" href="02-deploy.html">
+    <title>Create a Service Resource :: Java Operator Workshop</title>
+    <link rel="canonical" href="https://redhat-scholars.github.io/course-template/template-tutorial/05-create-service.html">
+    <link rel="prev" href="04-create-deployment.html">
+    <link rel="next" href="06-bonus.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
   </head>
@@ -51,7 +51,7 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="01-setup.html">1. Setup</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -63,7 +63,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="04-create-deployment.html">4. Create Deployment Resource</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="05-create-service.html">5. Create Service Resource</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -84,74 +84,100 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Template Tutorial</a></li>
-    <li><a href="01-setup.html">1. Setup</a></li>
+    <li><a href="05-create-service.html">5. Create Service Resource</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/redhat-scholars/operator-javasdk-workshop/edit/master/documentation/modules/ROOT/pages/01-setup.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/redhat-scholars/operator-javasdk-workshop/edit/master/documentation/modules/ROOT/pages/05-create-service.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Setup</h1>
-<div class="sect1">
-<h2 id="_clone_git_repository"><a class="anchor" href="#_clone_git_repository"></a>Clone Git Repository</h2>
+<h1 class="page">Create a Service Resource</h1>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>git clone <a href="https://github.com/sebastienblanc/greeting-operator.git" class="bare">https://github.com/sebastienblanc/greeting-operator.git</a></code></p>
+<p>Finally we need to expose our <code>Deployment</code> , so let&#8217;s update our operator so create a service.</p>
+</div>
+<div class="paragraph">
+<p>Create a java class named <code>ServiceDependant.java</code> with the following content :</p>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package com.redhat.devnation;
+
+import java.util.Map;
+
+import io.fabric8.kubernetes.api.model.IntOrString;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;
+
+public class ServiceDependant extends CRUDKubernetesDependentResource&lt;Service, Greeting&gt; {
+
+    public ServiceDependant() {
+        super(Service.class);
+    }
+
+    @Override
+    protected Service desired(Greeting primary, Context&lt;Greeting&gt; context) {
+        Service service = new ServiceBuilder()
+        .withNewMetadata()
+            .withName("greeting-service")
+            .withLabels(Map.of("app", "greeting-app"))
+        .endMetadata()
+        .withNewSpec()
+            .withType("LoadBalancer")
+            .addNewPort()
+                .withPort(8080)
+                .withTargetPort(new IntOrString(8080))
+                .withProtocol("TCP")
+            .endPort()
+            .withSelector(Map.of("app", "greeting-app"))
+        .endSpec()
+        .build();
+        return service;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And make sure to update the reconciler with the new dependant resource :</p>
+</div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ControllerConfiguration(namespaces = WATCH_CURRENT_NAMESPACE, dependents = {
+  @Dependent(type = DeploymentDependant.class),
+  @Dependent(type = ServiceDependant.class)})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Make sure your service has been created : <code>kubectl get service</code></p>
+</div>
+<div class="paragraph">
+<p>you should have an output like :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">NAME               TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)          AGE
+greeting-service   LoadBalancer   172.21.50.5   169.51.34.122   8080:30298/TCP   53m</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can test your service with the external ip with port <code>8080</code> !</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_connect_to_a_kubernetes_cluster"><a class="anchor" href="#_connect_to_a_kubernetes_cluster"></a>Connect to a Kubernetes cluster</h2>
+<h2 id="_update_your_cr"><a class="anchor" href="#_update_your_cr"></a>Update your CR</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Ask to your instructor for instruction, if you are using ROKS you can get your cluster <a href="https://get-devcluster-stage.apps.sandbox-stage.gb17.p1.openshiftapps.com/">here</a></p>
-</div>
-<div class="paragraph">
-<p>This workshop also works with minikube</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-This workshop does not work with the OpenShift Developer sandbox
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ide"><a class="anchor" href="#_ide"></a>IDE</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>You can use any IDE you want, as long you have support for JDK11 and Maven</p>
-</div>
-<div class="paragraph">
-<p>An other option is to use "Red Hat OpenShift Devspaces" you can get access to this by creating a developer <a href="https://developers.redhat.com/developer-sandbox">sandbox account</a></p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_resources"><a class="anchor" href="#_resources"></a>Resources</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://javaoperatorsdk.io/docs/getting-started">Java Operator SDK Doc</a></p>
-</li>
-<li>
-<p><a href="https://github.com/fabric8io/kubernetes-client/blob/master/doc/CHEATSHEET.md">Fabric8 K8s CLient Cheat Sheet</a></p>
-</li>
-</ul>
+<p>It&#8217;s time to play with our Operator, take your <code>Greeting.yaml</code> file and make some changes and don&#8217;t forget to apply it again !</p>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="index.html">Template Tutorial</a></span>
-  <span class="next"><a href="02-deploy.html">2. Deploy your operator</a></span>
+  <span class="prev"><a href="04-create-deployment.html">4. Create Deployment Resource</a></span>
+  <span class="next"><a href="06-bonus.html">6. Bonus</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

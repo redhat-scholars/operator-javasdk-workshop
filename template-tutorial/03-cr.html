@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Setup :: Java Operator Workshop</title>
-    <link rel="canonical" href="https://redhat-scholars.github.io/course-template/template-tutorial/01-setup.html">
-    <link rel="prev" href="index.html">
-    <link rel="next" href="02-deploy.html">
+    <title>Deploy your Custom Resource :: Java Operator Workshop</title>
+    <link rel="canonical" href="https://redhat-scholars.github.io/course-template/template-tutorial/03-cr.html">
+    <link rel="prev" href="02-deploy.html">
+    <link rel="next" href="04-create-deployment.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="../_/css/site.css">
   </head>
@@ -51,13 +51,13 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="01-setup.html">1. Setup</a>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="02-deploy.html">2. Deploy your operator</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="03-cr.html">3. Deploy your Custom Resource</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -84,74 +84,51 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Template Tutorial</a></li>
-    <li><a href="01-setup.html">1. Setup</a></li>
+    <li><a href="03-cr.html">3. Deploy your Custom Resource</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/redhat-scholars/operator-javasdk-workshop/edit/master/documentation/modules/ROOT/pages/01-setup.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/redhat-scholars/operator-javasdk-workshop/edit/master/documentation/modules/ROOT/pages/03-cr.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Setup</h1>
-<div class="sect1">
-<h2 id="_clone_git_repository"><a class="anchor" href="#_clone_git_repository"></a>Clone Git Repository</h2>
-<div class="sectionbody">
+<h1 class="page">Deploy your Custom Resource</h1>
 <div class="paragraph">
-<p><code>git clone <a href="https://github.com/sebastienblanc/greeting-operator.git" class="bare">https://github.com/sebastienblanc/greeting-operator.git</a></code></p>
+<p>Create a new file <code>Greeting.yaml</code> with the following content :</p>
 </div>
+<div class="listingblock lines_7 console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">apiVersion: "devnation.redhat.com/v1"
+kind: Greeting
+metadata:
+  name: greeting-instance
+spec:
+  color: "orange"
+  greeting: "Bonjour"</code></pre>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_connect_to_a_kubernetes_cluster"><a class="anchor" href="#_connect_to_a_kubernetes_cluster"></a>Connect to a Kubernetes cluster</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Ask to your instructor for instruction, if you are using ROKS you can get your cluster <a href="https://get-devcluster-stage.apps.sandbox-stage.gb17.p1.openshiftapps.com/">here</a></p>
-</div>
-<div class="paragraph">
-<p>This workshop also works with minikube</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-This workshop does not work with the OpenShift Developer sandbox
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ide"><a class="anchor" href="#_ide"></a>IDE</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>You can use any IDE you want, as long you have support for JDK11 and Maven</p>
 </div>
 <div class="paragraph">
-<p>An other option is to use "Red Hat OpenShift Devspaces" you can get access to this by creating a developer <a href="https://developers.redhat.com/developer-sandbox">sandbox account</a></p>
+<p>And apply it to your cluster :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">kubectl apply -f Greeting.yaml</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Make sure you see the created resource : <code>kubectl get Greeting</code></p>
 </div>
-<div class="sect1">
-<h2 id="_resources"><a class="anchor" href="#_resources"></a>Resources</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://javaoperatorsdk.io/docs/getting-started">Java Operator SDK Doc</a></p>
-</li>
-<li>
-<p><a href="https://github.com/fabric8io/kubernetes-client/blob/master/doc/CHEATSHEET.md">Fabric8 K8s CLient Cheat Sheet</a></p>
-</li>
-</ul>
+<div class="paragraph">
+<p>You should see one instance :</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">NAME                AGE
+greeting-instance   65m</code></pre>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="index.html">Template Tutorial</a></span>
-  <span class="next"><a href="02-deploy.html">2. Deploy your operator</a></span>
+  <span class="prev"><a href="02-deploy.html">2. Deploy your operator</a></span>
+  <span class="next"><a href="04-create-deployment.html">4. Create Deployment Resource</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
